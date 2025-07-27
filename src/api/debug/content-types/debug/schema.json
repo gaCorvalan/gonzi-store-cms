@@ -1,0 +1,15 @@
+{
+  "kind": "singleType",
+  "collectionName": "debugs",
+  "info": {
+    "singularName": "debug",
+    "pluralName": "debugs",
+    "displayName": "Debug",
+    "description": "Debug utilities for environment variables"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {}
+} 

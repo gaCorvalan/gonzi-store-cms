@@ -417,6 +417,31 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiDebugDebug extends Struct.SingleTypeSchema {
+  collectionName: 'debugs';
+  info: {
+    description: 'Debug utilities for environment variables';
+    displayName: 'Debug';
+    pluralName: 'debugs';
+    singularName: 'debug';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<'oneToMany', 'api::debug.debug'> &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiProductSetProductSet extends Struct.CollectionTypeSchema {
   collectionName: 'product_sets';
   info: {
@@ -1104,6 +1129,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::category.category': ApiCategoryCategory;
+      'api::debug.debug': ApiDebugDebug;
       'api::product-set.product-set': ApiProductSetProductSet;
       'api::product-variant.product-variant': ApiProductVariantProductVariant;
       'api::product.product': ApiProductProduct;
