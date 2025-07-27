@@ -1,0 +1,61 @@
+{
+  "kind": "collectionType",
+  "collectionName": "promotions",
+  "info": {
+    "singularName": "promotion",
+    "pluralName": "promotions",
+    "displayName": "Promotion"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "description": {
+      "type": "string",
+      "required": true
+    },
+    "discount_type": {
+      "type": "enumeration",
+      "required": true,
+      "default": "percentaje",
+      "enum": [
+        "percentaje",
+        "fixed_amount"
+      ]
+    },
+    "discount_value": {
+      "type": "integer",
+      "required": true
+    },
+    "start_date": {
+      "type": "datetime",
+      "required": true
+    },
+    "end_date": {
+      "type": "datetime",
+      "required": true
+    },
+    "applies_tp": {
+      "type": "enumeration",
+      "required": true,
+      "enum": [
+        "all_products",
+        "specific_categories",
+        "specific_products"
+      ]
+    },
+    "active": {
+      "type": "boolean",
+      "default": true
+    },
+    "promo_code": {
+      "type": "string",
+      "unique": true
+    }
+  }
+}
