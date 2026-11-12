@@ -37,16 +37,13 @@ La primera vez que abrís `/admin`, Strapi te pide crear el usuario administrado
 
 ## Para que la tienda pueda leer
 
-La app pública pide `GET /api/products` y `GET /api/categories` sin token. Strapi, recién instalado, responde 403: el rol **Public** no tiene permiso de lectura.
+La app pública pide `GET /api/products` y `GET /api/categories` sin token, con `?populate=*`.
 
-Por ahora se habilita a mano:
+Al arrancar, el CMS le asegura al rol **Public** permiso de solo lectura (`find` y `findOne`) en **Product**, **Category**, **Product variant** y **Product set**. Si el permiso ya está, no crea otro. Si marcaste algo más a mano, lo deja. No habilita `create`, `update` ni `delete`, y no toca **Promotion**.
 
-1. Entrá al admin.
-2. Andá a **Settings → Users & Permissions plugin → Roles → Public**.
-3. En **Product** y en **Category**, marcá **find**.
-4. Guardá.
+`populate=*` pide las relaciones del primer nivel. Strapi las devuelve solo si el rol puede hacer `find` en el tipo relacionado. Sin eso, `product_variants` y `product_sets` no salen en el JSON, aunque el producto o la categoría sí. Por eso la variante y el conjunto entran en esa lectura. `findOne` queda junto a `find` para leer un ítem por id.
 
-Sin eso, la tienda no puede listar productos ni categorías. `findOne` y el resto de las acciones no hacen falta para ese listado.
+No hace falta entrar a **Settings → Users & Permissions plugin → Roles → Public** para marcarlos.
 
 ## Variables de entorno
 
@@ -65,4 +62,4 @@ Cloudinary (`CLOUDINARY_NAME`, `CLOUDINARY_KEY`, `CLOUDINARY_SECRET`) es el luga
 - `GET {STRAPI_URL}/api/products?populate=*`
 - `GET {STRAPI_URL}/api/categories?populate=*`
 
-Esos datos alimentan las colecciones de Astro (productos y categorías). Por eso este CMS tiene que estar corriendo y el rol Public tiene que poder hacer `find` en esos dos tipos. Las imágenes de los productos salen de Cloudinary, que es donde este proyecto sube los archivos.
+Esos datos alimentan las colecciones de Astro (productos y categorías). Por eso este CMS tiene que estar corriendo. El permiso de lectura del rol Public se aplica solo al arrancar, como dice la sección anterior. Las imágenes de los productos salen de Cloudinary, que es donde este proyecto sube los archivos.
