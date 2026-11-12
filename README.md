@@ -1,6 +1,6 @@
 # Mini Gonzi — CMS
 
-Este repo es el CMS de la tienda Mini Gonzi. Corre [Strapi](https://strapi.io) 5.18.1. Ahí cargás productos, categorías, variantes, conjuntos y promociones. La tienda en sí es otra app, en Astro: [mi-emprendimiento](https://github.com/gaCorvalan/mi-emprendimiento). Esa app lee esta API; este CMS no la llama.
+Este proyecto es el CMS de la tienda Mini Gonzi. Corre [Strapi](https://strapi.io) 5.18.1. Ahí cargás productos, categorías, variantes, conjuntos y promociones. La tienda en sí es otra app, en Astro: [mi-emprendimiento](https://github.com/gaCorvalan/mi-emprendimiento). Esa app lee esta API; este CMS no la llama.
 
 ## Tipos de contenido
 
@@ -9,7 +9,7 @@ Este repo es el CMS de la tienda Mini Gonzi. Corre [Strapi](https://strapi.io) 5
 - **Product variant**: talle, color, stock y precio de una variante de un producto.
 - **Product set**: un conjunto de productos, con su propio precio.
 - **Promotion**: una promo, con descuento por porcentaje o por monto fijo, fechas y código.
-- **Debug**: un single type vacío; el endpoint `GET /api/debug/env` muestra si algunas variables de entorno están cargadas (sin auth).
+- **Debug**: un tipo único, sin campos. `GET /api/debug/env` muestra si algunas variables de entorno están cargadas, sin pedir usuario.
 
 ## Qué necesitás
 
@@ -51,11 +51,11 @@ Sin eso, la tienda no puede listar productos ni categorías. `findOne` y el rest
 
 ## Variables de entorno
 
-Están todas en `.env.example`, agrupadas y comentadas. Copiá ese archivo a `.env`. Los valores de ejemplo son placeholders: no pongas claves reales en el repo.
+Están todas en `.env.example`, agrupadas y comentadas. Copiá ese archivo a `.env`. Los valores de ejemplo son de relleno: no pongas claves reales en el repo.
 
 En local dejá `DATABASE_CLIENT=sqlite`. El archivo de la base queda en `.tmp/data.db`.
 
-Para Postgres (producción), comentá el bloque de sqlite, poné `DATABASE_CLIENT=postgres` y completá `DATABASE_URL` o host, puerto, nombre, usuario y clave. Las opciones de SSL, schema y pool también están en el ejemplo. El paquete `pg` ya está instalado.
+Para Postgres (producción), cambiá `DATABASE_CLIENT` a `postgres` y descomentá `DATABASE_URL`, o el host, el puerto, el nombre, el usuario y la clave. Las opciones de conexión segura, el esquema y el tamaño del pool también están en el ejemplo. El paquete `pg` ya está instalado.
 
 Cloudinary (`CLOUDINARY_NAME`, `CLOUDINARY_KEY`, `CLOUDINARY_SECRET`) es el lugar donde se guardan las imágenes. Podés arrancar con esos campos vacíos; el admin abre igual, pero subir un archivo falla hasta que los completes.
 
@@ -66,4 +66,4 @@ Cloudinary (`CLOUDINARY_NAME`, `CLOUDINARY_KEY`, `CLOUDINARY_SECRET`) es el luga
 - `GET {STRAPI_URL}/api/products?populate=*`
 - `GET {STRAPI_URL}/api/categories?populate=*`
 
-Esos datos alimentan las colecciones de Astro (productos y categorías). Por eso este CMS tiene que estar corriendo y el rol Public tiene que poder hacer `find` en esos dos tipos. Las imágenes de los productos salen de Cloudinary, que es el proveedor de upload de este proyecto.
+Esos datos alimentan las colecciones de Astro (productos y categorías). Por eso este CMS tiene que estar corriendo y el rol Public tiene que poder hacer `find` en esos dos tipos. Las imágenes de los productos salen de Cloudinary, que es donde este proyecto sube los archivos.
