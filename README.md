@@ -9,7 +9,6 @@ Este proyecto es el CMS de la tienda Mini Gonzi. Corre [Strapi](https://strapi.i
 - **Product variant**: talle, color, stock y precio de una variante de un producto.
 - **Product set**: un conjunto de productos, con su propio precio.
 - **Promotion**: una promo, con descuento por porcentaje o por monto fijo, fechas y código.
-- **Debug**: un tipo único, sin campos. `GET /api/debug/env` muestra si algunas variables de entorno están cargadas, sin pedir usuario.
 
 ## Qué necesitás
 
