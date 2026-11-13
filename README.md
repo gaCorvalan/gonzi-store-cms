@@ -4,7 +4,7 @@ Este proyecto es el CMS de la tienda Mini Gonzi. Corre [Strapi](https://strapi.i
 
 ## Tipos de contenido
 
-- **Product**: un producto (nombre, descripción, slug, precio base, imagen, si está destacado o activo).
+- **Product**: un producto (nombre, descripción, slug, precio base, imagen — puede no tener —, si está destacado o activo).
 - **Category**: una categoría, con slug, orden y la posibilidad de colgar subcategorías.
 - **Product variant**: talle, color, stock y precio de una variante de un producto.
 - **Product set**: un conjunto de productos, con su propio precio.
@@ -53,7 +53,7 @@ En local dejá `DATABASE_CLIENT=sqlite`. El archivo de la base queda en `.tmp/da
 
 Para Postgres (producción), cambiá `DATABASE_CLIENT` a `postgres` y descomentá `DATABASE_URL`, o el host, el puerto, el nombre, el usuario y la clave. Las opciones de conexión segura, el esquema y el tamaño del pool también están en el ejemplo. El paquete `pg` ya está instalado.
 
-Cloudinary (`CLOUDINARY_NAME`, `CLOUDINARY_KEY`, `CLOUDINARY_SECRET`) es el lugar donde se guardan las imágenes. Podés arrancar con esos campos vacíos; el admin abre igual, pero subir un archivo falla hasta que los completes.
+Cloudinary (`CLOUDINARY_NAME`, `CLOUDINARY_KEY`, `CLOUDINARY_SECRET`) es el lugar de las imágenes cuando las tres variables tienen valor. Si las dejás vacías, Strapi guarda los archivos en `public/uploads` de esta máquina. El admin abre igual, y podés subir archivos sin una cuenta de Cloudinary.
 
 ## Cómo se conecta con la tienda
 
@@ -62,4 +62,4 @@ Cloudinary (`CLOUDINARY_NAME`, `CLOUDINARY_KEY`, `CLOUDINARY_SECRET`) es el luga
 - `GET {STRAPI_URL}/api/products?populate=*`
 - `GET {STRAPI_URL}/api/categories?populate=*`
 
-Esos datos alimentan las colecciones de Astro (productos y categorías). Por eso este CMS tiene que estar corriendo. El permiso de lectura del rol Public se aplica solo al arrancar, como dice la sección anterior. Las imágenes de los productos salen de Cloudinary, que es donde este proyecto sube los archivos.
+Esos datos alimentan las colecciones de Astro (productos y categorías). Por eso este CMS tiene que estar corriendo. El permiso de lectura del rol Public se aplica solo al arrancar, como dice la sección anterior. Las imágenes salen de Cloudinary si configuraste la cuenta, o de `public/uploads` si no.
