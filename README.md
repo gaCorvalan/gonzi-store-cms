@@ -1,6 +1,6 @@
 # Mini Gonzi — CMS
 
-Este proyecto es el CMS de la tienda Mini Gonzi. Corre [Strapi](https://strapi.io) 5.18.1. Ahí cargás productos, categorías, variantes, conjuntos y promociones. La tienda en sí es otra app, en Astro: [mi-emprendimiento](https://github.com/gaCorvalan/mi-emprendimiento). Esa app lee esta API; este CMS no la llama.
+Este proyecto es el CMS de la tienda Mini Gonzi. Corre [Strapi](https://strapi.io) 5.62.0. Ahí cargás productos, categorías, variantes, conjuntos y promociones. La tienda en sí es otra app, en Astro: [mi-emprendimiento](https://github.com/gaCorvalan/mi-emprendimiento). Esa app lee esta API; este CMS no la llama.
 
 ## Tipos de contenido
 
@@ -12,7 +12,7 @@ Este proyecto es el CMS de la tienda Mini Gonzi. Corre [Strapi](https://strapi.i
 
 ## Qué necesitás
 
-- Node.js 22. El archivo `.nvmrc` fija esa versión. Strapi 5.18.1 acepta de 18 a 22; en este proyecto usamos 22.
+- Node.js 22.19 o más nuevo (hasta 26). El archivo `.nvmrc` pide 22.19. Strapi 5.62 usa undici 8 y no arranca en un Node 22 más viejo.
 - npm, el que viene con esa versión de Node.
 
 En local la base es SQLite. No hace falta instalar Postgres ni el driver a mano: `better-sqlite3` 11.3.0 ya está en las dependencias. `pg` queda para producción.
