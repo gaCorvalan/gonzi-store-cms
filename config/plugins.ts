@@ -1,29 +1,40 @@
-export default ({ env }) => ({
-  upload: {
-    config: {
-      provider: 'cloudinary',
-      providerOptions: {
-        cloud_name: env('CLOUDINARY_NAME'),
-        api_key: env('CLOUDINARY_KEY'),
-        api_secret: env('CLOUDINARY_SECRET'),
-      },
-      actionOptions: {
-        upload: {
-          folder: 'gonzi-store', // Carpeta en Cloudinary donde se guardarán los archivos
-          resource_type: 'auto', // Detecta automáticamente el tipo de archivo
-          use_filename: true,
-          unique_filename: false,
-          overwrite: false,
+export default ({ env }) => {
+  const cloudName = env('CLOUDINARY_NAME', '').trim();
+  const apiKey = env('CLOUDINARY_KEY', '').trim();
+  const apiSecret = env('CLOUDINARY_SECRET', '').trim();
+
+  // Sin las tres variables, Strapi usa el proveedor local (public/uploads).
+  if (!cloudName || !apiKey || !apiSecret) {
+    return {};
+  }
+
+  return {
+    upload: {
+      config: {
+        provider: 'cloudinary',
+        providerOptions: {
+          cloud_name: cloudName,
+          api_key: apiKey,
+          api_secret: apiSecret,
         },
-        uploadStream: {
-          folder: 'gonzi-store',
-          resource_type: 'auto',
-          use_filename: true,
-          unique_filename: false,
-          overwrite: false,
+        actionOptions: {
+          upload: {
+            folder: 'gonzi-store',
+            resource_type: 'auto',
+            use_filename: true,
+            unique_filename: false,
+            overwrite: false,
+          },
+          uploadStream: {
+            folder: 'gonzi-store',
+            resource_type: 'auto',
+            use_filename: true,
+            unique_filename: false,
+            overwrite: false,
+          },
+          delete: {},
         },
-        delete: {},
       },
     },
-  },
-});
+  };
+};
