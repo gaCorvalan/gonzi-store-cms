@@ -33,7 +33,7 @@ La primera vez tarda un poco: Strapi arma el panel de admin. Cuando termina, el 
 
 ## Primer administrador
 
-La primera vez que abrís `/admin`, Strapi te pide crear el usuario administrador (nombre, email y contraseña). Ese usuario entra al panel. No sale del `.env`: lo guardás en esa pantalla.
+La primera vez que abrís `/admin`, Strapi te pide crear el usuario administrador (nombre, email y contraseña). Ese usuario entra al panel. No sale del `.env`: lo guardás en esa pantalla. Si antes corrés `npm run seed` y todavía no había administrador, el script lo crea y te muestra el email y la clave en la terminal.
 
 ## Para que la tienda pueda leer
 
@@ -63,3 +63,28 @@ Cloudinary (`CLOUDINARY_NAME`, `CLOUDINARY_KEY`, `CLOUDINARY_SECRET`) es el luga
 - `GET {STRAPI_URL}/api/categories?populate=*`
 
 Esos datos alimentan las colecciones de Astro (productos y categorías). Por eso este CMS tiene que estar corriendo. El permiso de lectura del rol Public se aplica solo al arrancar, como dice la sección anterior. Las imágenes salen de Cloudinary si configuraste la cuenta, o de `public/uploads` si no.
+
+## Probar todo junto
+
+El CMS y la tienda van en carpetas distintas. En este proyecto:
+
+```bash
+nvm use
+npm ci
+cp .env.example .env
+npm run develop
+```
+
+Cuando el log dice que el servidor está en `http://localhost:1337`, en otra terminal, desde esta misma carpeta:
+
+```bash
+npm run seed
+```
+
+Eso publica 2 categorías y 3 productos de ejemplo. Uno no tiene imagen. Si lo corrés de nuevo, no duplica. La lectura pública ya quedó hecha al arrancar; el seed no toca permisos. La primera vez, si todavía no creaste el administrador, el script lo crea y te muestra el email y la clave. Quedan en `.tmp/seed-admin.json`. Si el administrador ya existía, poné `SEED_ADMIN_EMAIL` y `SEED_ADMIN_PASSWORD` en el `.env`.
+
+En [mi-emprendimiento](https://github.com/gaCorvalan/mi-emprendimiento):
+
+```bash
+STRAPI_URL=http://localhost:1337 npm run build && npm run preview
+```

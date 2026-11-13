@@ -2,6 +2,7 @@
 
 ## Sin publicar
 
+- `npm run seed` carga 2 categorías y 3 productos publicados (uno sin foto) y no duplica si lo corrés otra vez.
 - Sin datos de Cloudinary, los archivos se guardan en esta máquina. La imagen del producto ya no es obligatoria.
 - Al arrancar, el rol Public queda con `find` y `findOne` en productos, categorías, variantes y conjuntos, así la tienda lee el catálogo con `populate=*` sin marcar permisos a mano.
 - Se sacó el tipo único Debug y `GET /api/debug/env`. Esa ruta no pedía usuario y devolvía el nombre y la clave de Cloudinary.
