@@ -512,6 +512,7 @@ export interface ApiCategoryCategory extends Struct.CollectionTypeSchema {
       'manyToMany',
       'api::product-set.product-set'
     >;
+    products: Schema.Attribute.Relation<'manyToMany', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
     slug: Schema.Attribute.String & Schema.Attribute.Required;
     subcategories: Schema.Attribute.Relation<
@@ -623,7 +624,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     age_range: Schema.Attribute.String;
     base_price: Schema.Attribute.Decimal & Schema.Attribute.Required;
     categories: Schema.Attribute.Relation<
-      'oneToMany',
+      'manyToMany',
       'api::category.category'
     >;
     createdAt: Schema.Attribute.DateTime;
