@@ -44,6 +44,12 @@
       "target": "api::category.category",
       "inversedBy": "subcategories"
     },
+    "products": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::product.product",
+      "mappedBy": "categories"
+    },
     "order": {
       "type": "integer"
     },

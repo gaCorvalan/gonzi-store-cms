@@ -40,7 +40,7 @@ const PRODUCTS = [
     base_price: 18900,
     featured: true,
     active: true,
-    category: 'bodies',
+    categories: ['bodies', 'accesorios'],
     image: 'body-de-algodon.png',
   },
   {
@@ -50,7 +50,7 @@ const PRODUCTS = [
     base_price: 7500,
     featured: false,
     active: true,
-    category: 'accesorios',
+    categories: ['accesorios'],
     image: 'gorrito.png',
   },
   {
@@ -60,7 +60,7 @@ const PRODUCTS = [
     base_price: 24000,
     featured: false,
     active: true,
-    category: 'bodies',
+    categories: ['bodies'],
     image: null,
   },
 ];
@@ -326,7 +326,11 @@ async function main() {
       featured: product.featured,
       active: product.active,
       categories: {
-        connect: [categoryIds[product.category]],
+        connect: product.categories.map((slug) => {
+          const documentId = categoryIds[slug];
+          if (!documentId) fail(`El producto ${product.slug} apunta a la categoría ${slug}, que no existe.`);
+          return documentId;
+        }),
       },
     };
     if (product.image) {
