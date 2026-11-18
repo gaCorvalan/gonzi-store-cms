@@ -25,6 +25,10 @@
       "type": "string",
       "required": true
     },
+    "color_hex": {
+      "type": "string",
+      "regex": "^#[0-9A-Fa-f]{6}$"
+    },
     "material_variant": {
       "type": "string"
     },
@@ -33,7 +37,10 @@
       "required": false
     },
     "stock_quantity": {
-      "type": "integer"
+      "type": "integer",
+      "required": true,
+      "min": 0,
+      "default": 0
     },
     "low_stock_threshold": {
       "type": "integer"
