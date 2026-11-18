@@ -39,6 +39,8 @@ const CATEGORIES = [
   },
 ];
 
+const VARIANT_MODEL = 'api::product-variant.product-variant';
+
 const PRODUCTS = [
   {
     slug: 'body-de-algodon',
@@ -47,28 +49,58 @@ const PRODUCTS = [
     base_price: 18900,
     featured: true,
     active: true,
+    pieza_unica: false,
     categories: ['bodies', 'accesorios'],
     image: 'body-de-algodon.png',
+    variants: [
+      { size: '0-3 m', color: 'Crudo', color_hex: '#F4E1C1', stock_quantity: 4 },
+      { size: '3-6 m', color: 'Rosa viejo', color_hex: '#C47A8A', stock_quantity: 1, price: 19900 },
+      { size: '6-9 m', color: 'Rosa viejo', color_hex: '#C47A8A', stock_quantity: 0 },
+      { size: '9-12 m', color: 'Celeste', color_hex: '#9EC3E6', stock_quantity: 3 },
+    ],
   },
   {
     slug: 'gorrito',
     name: 'Gorrito',
-    description: 'Gorrito de abrigo para recién nacido.',
+    description: 'Gorrito de abrigo para recién nacido. Un solo talle.',
     base_price: 7500,
     featured: false,
     active: true,
+    pieza_unica: false,
     categories: ['accesorios'],
     image: 'gorrito.png',
+    variants: [
+      { size: 'Talle único', color: 'Natural', color_hex: '#E6D5C3', stock_quantity: 5 },
+    ],
   },
   {
     slug: 'manta',
     name: 'Manta',
-    description: 'Manta liviana. Esta ficha no tiene foto a propósito.',
+    description: 'Manta liviana. Esta ficha no tiene foto a propósito y no tiene stock.',
     base_price: 24000,
     featured: false,
     active: true,
+    pieza_unica: false,
     categories: ['bodies'],
     image: null,
+    variants: [
+      { size: '0-3 m', color: 'Gris', color_hex: '#BDBDBD', stock_quantity: 0 },
+      { size: '3-6 m', color: 'Gris', color_hex: '#BDBDBD', stock_quantity: 0 },
+    ],
+  },
+  {
+    slug: 'body-bordado',
+    name: 'Body bordado',
+    description: 'Pieza única, bordada a mano. Hay una sola.',
+    base_price: 32000,
+    featured: false,
+    active: true,
+    pieza_unica: true,
+    categories: ['bodies'],
+    image: null,
+    variants: [
+      { size: '3-6 m', color: 'Verde salvia', color_hex: '#8FA58B', stock_quantity: 1 },
+    ],
   },
 ];
 
@@ -336,6 +368,65 @@ async function ensureTienda(root, token) {
   console.log(current ? 'Tienda: actualizada.' : 'Tienda: creada.');
 }
 
+function variantKey(size, color) {
+  return `${size}\0${color}`;
+}
+
+function belongsToProduct(entry, productDocumentId) {
+  const product = entry.product;
+  if (!product) return true;
+  if (typeof product === 'string') return product === productDocumentId;
+  if (product.documentId) return product.documentId === productDocumentId;
+  return true;
+}
+
+async function listVariants(root, token, productDocumentId) {
+  const params = new URLSearchParams({
+    pageSize: '100',
+    'filters[product][documentId][$eq]': productDocumentId,
+  });
+  const found = [];
+  for (const status of ['published', 'draft']) {
+    params.set('status', status);
+    const body = await request(
+      `${root}/content-manager/collection-types/${VARIANT_MODEL}?${params}`,
+      { token }
+    );
+    for (const entry of body.results || []) {
+      if (entry.size && entry.color && belongsToProduct(entry, productDocumentId)) {
+        found.push(entry);
+      }
+    }
+  }
+  return found;
+}
+
+async function ensureVariants(root, token, product, productDocumentId) {
+  const existing = await listVariants(root, token, productDocumentId);
+  const seen = new Set(existing.map((entry) => variantKey(entry.size, entry.color)));
+  for (const variant of product.variants) {
+    const key = variantKey(variant.size, variant.color);
+    if (seen.has(key)) {
+      console.log(`Variante ${product.slug} ${variant.size} / ${variant.color}: ya estaba.`);
+      continue;
+    }
+    const data = {
+      size: variant.size,
+      color: variant.color,
+      color_hex: variant.color_hex,
+      stock_quantity: variant.stock_quantity,
+      active: true,
+      product: {
+        connect: [productDocumentId],
+      },
+    };
+    if (variant.price != null) data.price = variant.price;
+    await publishNew(root, token, VARIANT_MODEL, data);
+    seen.add(key);
+    console.log(`Variante ${product.slug} ${variant.size} / ${variant.color}: creada.`);
+  }
+}
+
 async function countPublished(root, plural) {
   const body = await request(`${root}/api/${plural}?pagination[pageSize]=1`);
   const total = body?.meta?.pagination?.total;
@@ -354,6 +445,7 @@ async function main() {
   const before = {
     categories: await countPublished(root, 'categories'),
     products: await countPublished(root, 'products'),
+    variants: await countPublished(root, 'product-variants'),
   };
 
   const categoryIds = {};
@@ -376,30 +468,34 @@ async function main() {
 
   for (const product of PRODUCTS) {
     const existing = await findBySlug(root, token, 'api::product.product', product.slug);
+    let documentId;
     if (existing.length > 0) {
+      documentId = existing[0].documentId;
       console.log(`Producto ${product.slug}: ya estaba.`);
-      continue;
+    } else {
+      const data = {
+        name: product.name,
+        slug: product.slug,
+        description: product.description,
+        base_price: product.base_price,
+        featured: product.featured,
+        active: product.active,
+        pieza_unica: product.pieza_unica,
+        categories: {
+          connect: product.categories.map((slug) => {
+            const categoryId = categoryIds[slug];
+            if (!categoryId) fail(`El producto ${product.slug} apunta a la categoría ${slug}, que no existe.`);
+            return categoryId;
+          }),
+        },
+      };
+      if (product.image) {
+        data.image = await uploadPlaceholder(root, token, product.image);
+      }
+      documentId = await publishNew(root, token, 'api::product.product', data);
+      console.log(`Producto ${product.slug}: creado.`);
     }
-    const data = {
-      name: product.name,
-      slug: product.slug,
-      description: product.description,
-      base_price: product.base_price,
-      featured: product.featured,
-      active: product.active,
-      categories: {
-        connect: product.categories.map((slug) => {
-          const documentId = categoryIds[slug];
-          if (!documentId) fail(`El producto ${product.slug} apunta a la categoría ${slug}, que no existe.`);
-          return documentId;
-        }),
-      },
-    };
-    if (product.image) {
-      data.image = await uploadPlaceholder(root, token, product.image);
-    }
-    await publishNew(root, token, 'api::product.product', data);
-    console.log(`Producto ${product.slug}: creado.`);
+    await ensureVariants(root, token, product, documentId);
   }
 
   await ensureTienda(root, token);
@@ -407,9 +503,11 @@ async function main() {
   const after = {
     categories: await countPublished(root, 'categories'),
     products: await countPublished(root, 'products'),
+    variants: await countPublished(root, 'product-variants'),
   };
   console.log(`Categorías: ${after.categories} (antes ${before.categories})`);
   console.log(`Productos: ${after.products} (antes ${before.products})`);
+  console.log(`Variantes: ${after.variants} (antes ${before.variants})`);
 }
 
 main().catch((error) => {

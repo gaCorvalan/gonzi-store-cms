@@ -50,6 +50,10 @@
       "type": "boolean",
       "default": true
     },
+    "pieza_unica": {
+      "type": "boolean",
+      "default": false
+    },
     "meta_title": {
       "type": "text"
     },

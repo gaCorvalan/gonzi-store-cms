@@ -4,9 +4,9 @@ Este proyecto es el CMS de la tienda Mini Gonzi. Corre [Strapi](https://strapi.i
 
 ## Tipos de contenido
 
-- **Product**: un producto (nombre, descripción, slug, precio base, imagen — puede no tener —, si está destacado o activo).
+- **Product**: un producto (nombre, descripción, slug, precio base, imagen — puede no tener —, si está destacado o activo). `pieza_unica` es un sí/no, por defecto no: marca una prenda de una sola. No es el stock.
 - **Category**: una categoría, con slug, orden y la posibilidad de colgar subcategorías.
-- **Product variant**: talle, color, stock y precio de una variante de un producto.
+- **Product variant**: una fila por talle y color, ligada al producto (varias variantes, un producto). No es un componente. `stock_quantity` es obligatorio, entero, mínimo 0 y por defecto 0. `color_hex` es opcional y tiene que ser `#RRGGBB` (el color del cuadradito). `price` sigue siendo opcional: si está vacío, vale el precio base del producto. "Última unidad" no se guarda. La tienda la muestra cuando `stock_quantity` es 1. Sin stock es `stock_quantity` en 0.
 - **Product set**: un conjunto de productos, con su propio precio.
 - **Promotion**: una promo, con descuento por porcentaje o por monto fijo, fechas y código.
 - **Tienda**: un solo registro, el que edita el admin. `nombre` (obligatorio, por ejemplo Mini Gonzi), `whatsapp` (opcional, solo dígitos, de 8 a 15; el número lo carga el admin), `texto_envio` (por defecto "A coordinar") y `moneda` (por defecto "ARS"). La tienda lo lee con `GET /api/tienda`.
@@ -82,7 +82,7 @@ Cuando el log dice que el servidor está en `http://localhost:1337`, en otra ter
 npm run seed
 ```
 
-Eso publica 2 categorías y 3 productos de ejemplo. Uno no tiene imagen. También publica la Tienda: nombre "Mini Gonzi", texto de envío "A coordinar", moneda "ARS" y el WhatsApp vacío. Si lo corrés de nuevo, no duplica. La lectura pública ya quedó hecha al arrancar; el seed no toca permisos. La primera vez, si todavía no creaste el administrador, el script lo crea y te muestra el email y la clave. Quedan en `.tmp/seed-admin.json`. Si el administrador ya existía, poné `SEED_ADMIN_EMAIL` y `SEED_ADMIN_PASSWORD` en el `.env`.
+Eso publica 2 categorías y 4 productos de ejemplo, con variantes. Uno no tiene imagen. El body de algodón tiene varios talles y colores: una combinación queda en 1 (última unidad) y otra en 0. El gorrito es "Talle único". La manta tiene todas las variantes en 0. El body bordado es pieza única, con una sola variante y stock 1. También publica la Tienda: nombre "Mini Gonzi", texto de envío "A coordinar", moneda "ARS" y el WhatsApp vacío. Si lo corrés de nuevo, no duplica. La lectura pública ya quedó hecha al arrancar; el seed no toca permisos. La primera vez, si todavía no creaste el administrador, el script lo crea y te muestra el email y la clave. Quedan en `.tmp/seed-admin.json`. Si el administrador ya existía, poné `SEED_ADMIN_EMAIL` y `SEED_ADMIN_PASSWORD` en el `.env`.
 
 En [mi-emprendimiento](https://github.com/gaCorvalan/mi-emprendimiento):
 

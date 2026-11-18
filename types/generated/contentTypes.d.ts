@@ -582,6 +582,7 @@ export interface ApiProductVariantProductVariant
   attributes: {
     active: Schema.Attribute.Boolean;
     color: Schema.Attribute.String & Schema.Attribute.Required;
+    color_hex: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -601,7 +602,15 @@ export interface ApiProductVariantProductVariant
     product: Schema.Attribute.Relation<'manyToOne', 'api::product.product'>;
     publishedAt: Schema.Attribute.DateTime;
     size: Schema.Attribute.String & Schema.Attribute.Required;
-    stock_quantity: Schema.Attribute.Integer;
+    stock_quantity: Schema.Attribute.Integer &
+      Schema.Attribute.Required &
+      Schema.Attribute.SetMinMax<
+        {
+          min: 0;
+        },
+        number
+      > &
+      Schema.Attribute.DefaultTo<0>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -642,6 +651,7 @@ export interface ApiProductProduct extends Struct.CollectionTypeSchema {
     material: Schema.Attribute.String;
     meta_title: Schema.Attribute.Text;
     name: Schema.Attribute.String & Schema.Attribute.Required;
+    pieza_unica: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     product_sets: Schema.Attribute.Relation<
       'manyToMany',
       'api::product-set.product-set'
