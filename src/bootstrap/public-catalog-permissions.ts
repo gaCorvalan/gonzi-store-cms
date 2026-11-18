@@ -10,6 +10,9 @@ import type { Core } from '@strapi/strapi';
  * del listado no trae esas relaciones. `findOne` acompaña a
  * `find` para leer un ítem por id. No se otorgan create, update ni
  * delete. Promoción no es relación de estos tipos.
+ *
+ * Tienda es un tipo único: su ruta pública es `GET /api/tienda`
+ * (`find`). No tiene `findOne`.
  */
 const PUBLIC_READ_UIDS = [
   'api::product.product',
@@ -17,6 +20,8 @@ const PUBLIC_READ_UIDS = [
   'api::product-variant.product-variant',
   'api::product-set.product-set',
 ] as const;
+
+const PUBLIC_SINGLE_FIND_UIDS = ['api::tienda.tienda'] as const;
 
 const READ_ACTIONS = ['find', 'findOne'] as const;
 
@@ -34,32 +39,40 @@ export async function ensurePublicCatalogPermissions(strapi: Core.Strapi) {
   let created = 0;
   let alreadyPresent = 0;
 
+  const ensureAction = async (uid: string, actionName: string) => {
+    const action = `${uid}.${actionName}`;
+    const existing = await strapi.db.query('plugin::users-permissions.permission').findOne({
+      where: {
+        action,
+        role: { id: publicRole.id },
+      },
+    });
+
+    if (existing) {
+      alreadyPresent += 1;
+      return;
+    }
+
+    await strapi.db.query('plugin::users-permissions.permission').create({
+      data: {
+        action,
+        role: publicRole.id,
+      },
+    });
+    created += 1;
+  };
+
   for (const uid of PUBLIC_READ_UIDS) {
     for (const actionName of READ_ACTIONS) {
-      const action = `${uid}.${actionName}`;
-      const existing = await strapi.db.query('plugin::users-permissions.permission').findOne({
-        where: {
-          action,
-          role: { id: publicRole.id },
-        },
-      });
-
-      if (existing) {
-        alreadyPresent += 1;
-        continue;
-      }
-
-      await strapi.db.query('plugin::users-permissions.permission').create({
-        data: {
-          action,
-          role: publicRole.id,
-        },
-      });
-      created += 1;
+      await ensureAction(uid, actionName);
     }
   }
 
+  for (const uid of PUBLIC_SINGLE_FIND_UIDS) {
+    await ensureAction(uid, 'find');
+  }
+
   strapi.log.info(
-    `Rol Public: find y findOne en product, category, product-variant y product-set. Nuevos: ${created}. Ya estaban: ${alreadyPresent}.`
+    `Rol Public: find y findOne en product, category, product-variant y product-set; find en tienda. Nuevos: ${created}. Ya estaban: ${alreadyPresent}.`
   );
 }

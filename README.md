@@ -9,6 +9,7 @@ Este proyecto es el CMS de la tienda Mini Gonzi. Corre [Strapi](https://strapi.i
 - **Product variant**: talle, color, stock y precio de una variante de un producto.
 - **Product set**: un conjunto de productos, con su propio precio.
 - **Promotion**: una promo, con descuento por porcentaje o por monto fijo, fechas y código.
+- **Tienda**: un solo registro, el que edita el admin. `nombre` (obligatorio, por ejemplo Mini Gonzi), `whatsapp` (opcional, solo dígitos, de 8 a 15; el número lo carga el admin), `texto_envio` (por defecto "A coordinar") y `moneda` (por defecto "ARS"). La tienda lo lee con `GET /api/tienda`.
 
 ## Qué necesitás
 
@@ -39,7 +40,7 @@ La primera vez que abrís `/admin`, Strapi te pide crear el usuario administrado
 
 La app pública pide `GET /api/products` y `GET /api/categories` sin token, con `?populate=*`.
 
-Al arrancar, el CMS le asegura al rol **Public** permiso de solo lectura (`find` y `findOne`) en **Product**, **Category**, **Product variant** y **Product set**. Si el permiso ya está, no crea otro. Si marcaste algo más a mano, lo deja. No habilita `create`, `update` ni `delete`, y no toca **Promotion**.
+Al arrancar, el CMS le asegura al rol **Public** permiso de solo lectura (`find` y `findOne`) en **Product**, **Category**, **Product variant** y **Product set**, y `find` en **Tienda** (`GET /api/tienda`; es un tipo único y no tiene `findOne`). Si el permiso ya está, no crea otro. Si marcaste algo más a mano, lo deja. No habilita `create`, `update` ni `delete`, y no toca **Promotion**.
 
 `populate=*` pide las relaciones del primer nivel. Strapi las devuelve solo si el rol puede hacer `find` en el tipo relacionado. Sin eso, `product_variants` y `product_sets` no salen en el JSON, aunque el producto o la categoría sí. Por eso la variante y el conjunto entran en esa lectura. `findOne` queda junto a `find` para leer un ítem por id.
 
@@ -81,7 +82,7 @@ Cuando el log dice que el servidor está en `http://localhost:1337`, en otra ter
 npm run seed
 ```
 
-Eso publica 2 categorías y 3 productos de ejemplo. Uno no tiene imagen. Si lo corrés de nuevo, no duplica. La lectura pública ya quedó hecha al arrancar; el seed no toca permisos. La primera vez, si todavía no creaste el administrador, el script lo crea y te muestra el email y la clave. Quedan en `.tmp/seed-admin.json`. Si el administrador ya existía, poné `SEED_ADMIN_EMAIL` y `SEED_ADMIN_PASSWORD` en el `.env`.
+Eso publica 2 categorías y 3 productos de ejemplo. Uno no tiene imagen. También publica la Tienda: nombre "Mini Gonzi", texto de envío "A coordinar", moneda "ARS" y el WhatsApp vacío. Si lo corrés de nuevo, no duplica. La lectura pública ya quedó hecha al arrancar; el seed no toca permisos. La primera vez, si todavía no creaste el administrador, el script lo crea y te muestra el email y la clave. Quedan en `.tmp/seed-admin.json`. Si el administrador ya existía, poné `SEED_ADMIN_EMAIL` y `SEED_ADMIN_PASSWORD` en el `.env`.
 
 En [mi-emprendimiento](https://github.com/gaCorvalan/mi-emprendimiento):
 

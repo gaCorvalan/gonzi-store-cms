@@ -14,6 +14,13 @@ const ROOT = path.join(__dirname, '..');
 const PLACEHOLDERS = path.join(__dirname, 'placeholders');
 const ADMIN_FILE = path.join(ROOT, '.tmp', 'seed-admin.json');
 const SEED_EMAIL = 'seed-local@example.com';
+const TIENDA_MODEL = 'api::tienda.tienda';
+const TIENDA = {
+  nombre: 'Mini Gonzi',
+  texto_envio: 'A coordinar',
+  moneda: 'ARS',
+  whatsapp: null,
+};
 
 const CATEGORIES = [
   {
@@ -274,6 +281,61 @@ async function uploadPlaceholder(root, token, filename) {
   return file.id;
 }
 
+function tiendaIsSeeded(entry) {
+  if (!entry?.documentId || !entry.publishedAt) return false;
+  const whatsappEmpty = entry.whatsapp == null || entry.whatsapp === '';
+  return (
+    entry.nombre === TIENDA.nombre &&
+    entry.texto_envio === TIENDA.texto_envio &&
+    entry.moneda === TIENDA.moneda &&
+    whatsappEmpty
+  );
+}
+
+async function readPublishedTienda(root, token) {
+  const url = `${root}/content-manager/single-types/${TIENDA_MODEL}?status=published`;
+  const headers = { Authorization: `Bearer ${token}` };
+  let response;
+  try {
+    response = await fetch(url, { headers });
+  } catch (error) {
+    fail(
+      `No pude conectar con ${url}. Levantá el CMS con npm run develop y volvé a correr npm run seed.\n${error.message}`
+    );
+  }
+  const text = await response.text();
+  let parsed = null;
+  if (text) {
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = text;
+    }
+  }
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    const detail = typeof parsed === 'string' ? parsed : JSON.stringify(parsed);
+    fail(`GET ${url} respondió ${response.status}.\n${detail}`);
+  }
+  const data = parsed?.data;
+  if (!data || !data.documentId) return null;
+  return data;
+}
+
+async function ensureTienda(root, token) {
+  const current = await readPublishedTienda(root, token);
+  if (tiendaIsSeeded(current)) {
+    console.log('Tienda: ya estaba.');
+    return;
+  }
+  await request(`${root}/content-manager/single-types/${TIENDA_MODEL}/actions/publish`, {
+    method: 'POST',
+    token,
+    body: TIENDA,
+  });
+  console.log(current ? 'Tienda: actualizada.' : 'Tienda: creada.');
+}
+
 async function countPublished(root, plural) {
   const body = await request(`${root}/api/${plural}?pagination[pageSize]=1`);
   const total = body?.meta?.pagination?.total;
@@ -339,6 +401,8 @@ async function main() {
     await publishNew(root, token, 'api::product.product', data);
     console.log(`Producto ${product.slug}: creado.`);
   }
+
+  await ensureTienda(root, token);
 
   const after = {
     categories: await countPublished(root, 'categories'),

@@ -1,0 +1,31 @@
+{
+  "kind": "singleType",
+  "collectionName": "tiendas",
+  "info": {
+    "singularName": "tienda",
+    "pluralName": "tiendas",
+    "displayName": "Tienda"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nombre": {
+      "type": "string",
+      "required": true
+    },
+    "whatsapp": {
+      "type": "string",
+      "regex": "^[0-9]{8,15}$"
+    },
+    "texto_envio": {
+      "type": "string",
+      "default": "A coordinar"
+    },
+    "moneda": {
+      "type": "string",
+      "default": "ARS"
+    }
+  }
+}
