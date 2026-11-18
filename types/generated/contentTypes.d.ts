@@ -701,6 +701,38 @@ export interface ApiPromotionPromotion extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiTiendaTienda extends Struct.SingleTypeSchema {
+  collectionName: 'tiendas';
+  info: {
+    displayName: 'Tienda';
+    pluralName: 'tiendas';
+    singularName: 'tienda';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::tienda.tienda'
+    > &
+      Schema.Attribute.Private;
+    moneda: Schema.Attribute.String & Schema.Attribute.DefaultTo<'ARS'>;
+    nombre: Schema.Attribute.String & Schema.Attribute.Required;
+    publishedAt: Schema.Attribute.DateTime;
+    texto_envio: Schema.Attribute.String &
+      Schema.Attribute.DefaultTo<'A coordinar'>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    whatsapp: Schema.Attribute.String;
+  };
+}
+
 export interface PluginContentReleasesRelease
   extends Struct.CollectionTypeSchema {
   collectionName: 'strapi_releases';
@@ -1241,6 +1273,7 @@ declare module '@strapi/strapi' {
       'api::product-variant.product-variant': ApiProductVariantProductVariant;
       'api::product.product': ApiProductProduct;
       'api::promotion.promotion': ApiPromotionPromotion;
+      'api::tienda.tienda': ApiTiendaTienda;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;
