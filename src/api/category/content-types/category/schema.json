@@ -16,7 +16,8 @@
       "required": true
     },
     "slug": {
-      "type": "string",
+      "type": "uid",
+      "targetField": "name",
       "required": true
     },
     "description": {
@@ -26,10 +27,7 @@
       "type": "media",
       "multiple": false,
       "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
+        "images"
       ]
     },
     "subcategories": {

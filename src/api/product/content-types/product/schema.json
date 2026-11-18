@@ -16,11 +16,12 @@
       "required": true
     },
     "description": {
-      "type": "string",
+      "type": "text",
       "required": true
     },
     "slug": {
-      "type": "string",
+      "type": "uid",
+      "targetField": "name",
       "required": true
     },
     "image": {
@@ -28,10 +29,7 @@
       "multiple": false,
       "required": false,
       "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
+        "images"
       ]
     },
     "base_price": {
